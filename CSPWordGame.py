@@ -18,8 +18,11 @@ class wordDictionary:
             wordList[-1] = wordList[-1].replace('\r','').replace('\n','')
             self.dictionary[words[0]] = wordList
     
-    def getLetters(self, category, position, firstLetter = None, secondLetter = None, thirdLetter = None):
+    def getLetters(self, category, position, otherLetters = (None, None, None)):
         letters = []
+        firstLetter = otherLetters[0]
+        secondLetter = otherLetters[1]
+        thirdLetter = otherLetters[2]
         for word in self.dictionary[category]:
             if ((word[0] == firstLetter or firstLetter == None) and (word[1] == secondLetter or secondLetter == None) and \
                 (word[2] == thirdLetter or thirdLetter == None)):
@@ -28,8 +31,11 @@ class wordDictionary:
                     letters.append(newLetter)
         return letters
             
-    def getWords(self, category = None, firstLetter = None, secondLetter = None, thirdLetter = None):
+    def getWords(self, category = None, otherLetters = (None, None, None)):
         words = []
+        firstLetter = otherLetters[0]
+        secondLetter = otherLetters[1]
+        thirdLetter = otherLetters[2]
         for word in self.dictionary[category]:
             if ((word[0] == firstLetter or firstLetter == None) and (word[1] == secondLetter or secondLetter == None) and \
                 (word[2] == thirdLetter or thirdLetter == None)):
@@ -42,6 +48,7 @@ def intersection(L1, L2):
         if e in L2:
             newL.append(e)
     return newL
+            
         
 
 '''
@@ -52,7 +59,9 @@ class LetterCSP:
         data = urllib2.urlopen(url)
         i = 0
         self.valTracker = {}
+        self.constraints = {}
         for line in data:
+            variableList = []
             if i == 0:
                 self.size = int(line)
                 for j in range(1,self.size+1):
@@ -60,10 +69,12 @@ class LetterCSP:
             else:
                 labels = line.split(":")
                 category = labels[0]
+                self.constraints[category] = []
                 entries = labels[1].split(",")
                 entries[-1] = entries[-1].replace("\r\n","")
                 position = 0
                 for entry in entries:
+                    #constrain possible values
                     key = int(entry)
                     if not self.valTracker[key]: 
                         self.valTracker[key] = dictionary.getLetters(category, position)
@@ -71,21 +82,8 @@ class LetterCSP:
                         self.valTracker[key] = intersection(self.valTracker[key], dictionary.getLetters(category, position))
                     position += 1
                     
-                print self.valTracker    
+                    variableList.append(key)
+                    
+                    self.constraints[category].append(int(entry))
             i += 1
-        
-        
-
-def letterBacktrack(assignment):
-    
-    
-
-
-'''
-Word Formulation Problems
-'''
-
-class WordCSP:
-    
-def wordBacktrack(assignement):
     
