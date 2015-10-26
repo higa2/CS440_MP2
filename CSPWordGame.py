@@ -42,12 +42,12 @@ class wordDictionary:
                 words.append(word)
         return words
     
-def intersection(L1, L2):
-    newL = []
-    for e in L1:
-        if e in L2:
-            newL.append(e)
-    return newL
+    def intersection(L1, L2):
+        newL = []
+        for e in L1:
+            if e in L2:
+                newL.append(e)
+        return newL
             
         
 
@@ -86,4 +86,54 @@ class LetterCSP:
                     
                     self.constraints[category].append(int(entry))
             i += 1
-    
+
+class WordCSP:
+    def __init__(self, url, dictionary):
+        data = urllib2.urlopen(url)
+        i = 0
+        self.valTracker = {}
+        self.constraints = {}
+        self.possibleCategories = {} # number of possible word categories at entry
+        self.constrainedCategories = {} # most constrained to least constrained
+        for line in data:
+            variableList = []
+            if i == 0:
+                self.size = int(line)
+                for j in range(1,self.size+1):
+                    self.valTracker[j] = []
+            else:
+                labels = line.split(":")
+                category = labels[0]
+                self.constraints[category] = []
+                entries = labels[1].split(",")
+                entries[-1] = entries[-1].replace("\r\n","")
+                position = 0
+                for entry in entries:
+                    #constrain possible values
+                    key = int(entry)
+                    possibleCategories[key] += 1 
+#                    if not self.valTracker[key]: 
+#                        self.valTracker[key] = dictionary.getWords(category)
+#                    else:
+#                        self.valTracker[key] = intersection(self.valTracker[key], dictionary.getWords(category))
+                    position += 1
+                    
+                    variableList.append(key)
+                    
+                    self.constraints[category].append(int(entry))
+            i += 1
+        i = 0
+        for line in data
+            if i == 0:
+            else:
+                labels = line.split(":")
+                category = labels[0]
+                entries = labels[1].split(",")
+                entries[-1] = entries[-1].replace("\r\n","")
+                constrainedCategories[i-1][0] = category
+                for entry in entries
+                    constrainedCategories[i-1][1] += possibleCategories[entry]
+            i += 1
+        sorted(constrainedCategories, key=lambda categories: categories[1])
+            
+        
