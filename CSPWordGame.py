@@ -4,6 +4,7 @@ Ryley Higa, James Jia, Shaksham Saini
 
 '''
 import urllib2
+from operator import itemgetter, attrgetter
 
 class wordDictionary:
     def __init__(self, url):
@@ -42,12 +43,12 @@ class wordDictionary:
                 words.append(word)
         return words
     
-    def intersection(L1, L2):
-        newL = []
-        for e in L1:
-            if e in L2:
-                newL.append(e)
-        return newL
+def intersection(L1, L2):
+    newL = []
+    for e in L1:
+        if e in L2:
+            newL.append(e)
+    return newL
             
         
 
@@ -94,13 +95,13 @@ class WordCSP:
         self.valTracker = {}
         self.constraints = {}
         self.possibleCategories = {} # number of possible word categories at entry
-        self.constrainedCategories = {} # most constrained to least constrained
         for line in data:
             variableList = []
             if i == 0:
                 self.size = int(line)
                 for j in range(1,self.size+1):
-                    self.valTracker[j] = []
+                    self.possibleCategories[j] = 0
+#                    self.constrainedCategories[j-1] = (0,0)
             else:
                 labels = line.split(":")
                 category = labels[0]
@@ -111,7 +112,10 @@ class WordCSP:
                 for entry in entries:
                     #constrain possible values
                     key = int(entry)
-                    possibleCategories[key] += 1 
+                    if not self.possibleCategories[key]:
+                        self.possibleCategories[key] = 1
+                    else:
+                        self.possibleCategories[key] += 1 
 #                    if not self.valTracker[key]: 
 #                        self.valTracker[key] = dictionary.getWords(category)
 #                    else:
@@ -122,18 +126,29 @@ class WordCSP:
                     
                     self.constraints[category].append(int(entry))
             i += 1
+        
+        self.constrainedCategories = [[0,0,{},0] for k in range(i-1)]  # most constrained to least constrained
         i = 0
-        for line in data
+        
+        self.test = 0
+        data = urllib2.urlopen(url)
+        
+        for line in data:
             if i == 0:
+                self.test = 1
             else:
+                self.test += 1
                 labels = line.split(":")
                 category = labels[0]
                 entries = labels[1].split(",")
                 entries[-1] = entries[-1].replace("\r\n","")
-                constrainedCategories[i-1][0] = category
-                for entry in entries
-                    constrainedCategories[i-1][1] += possibleCategories[entry]
+                self.constrainedCategories[i-1][0] = category
+                self.constrainedCategories[i-1][3] = -len(dictionary.getWords(category))
+                for entry in entries:
+                    key = int(entry)
+                    self.constrainedCategories[i-1][1] += self.possibleCategories[key]
+                self.constrainedCategories[i-1][2] = entries
             i += 1
-        sorted(constrainedCategories, key=lambda categories: categories[1])
+
+        self.constrainedCategories = sorted(self.constrainedCategories, key=itemgetter(1, 3), reverse=True)
             
-        
